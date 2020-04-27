@@ -1,0 +1,56 @@
+<?php
+
+header('Cache-Control: no-cache, must-revalidate');
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', dirname(__FILE__) . '/usr/local/apache/logs/error_log.txt');
+error_reporting(E_ALL);
+error_reporting(0);
+
+$tacserver = "localhost";
+//$tacserver = "track1.glovision.co";
+//$tacserver = "glotrax.glovision.co";
+//$tacusername = "root";
+$tacusername = "root";
+
+$tacpassword = "gl0v1s10n";
+$tacdb = "autocare_gts";
+session_start();
+$DatetoServer= $_GET['fromDate'];
+$serverDerection='old';
+if($DatetoServer!=""){
+  
+  $save_Date=explode(" ", $DatetoServer);
+  $currDatetoServer=date("Y-m-d");
+  
+  if($save_Date[0]!=$currDatetoServer){
+      
+      $serverDerection="new";
+  }
+}
+
+//$gtsserver ="track.glovision.co";
+//$gtsserver ="198.100.146.168";
+//$gtsserver ="192.168.0.105";
+$gtsserver ="glotrax.glovision.co";
+$gtsusername ="gts";
+$gtspassword="opengts";
+$gtsdb ="gts";
+if($_SESSION['server'] !="" ){
+  // $gtsserver =$_SESSION['server'];
+  // $gtsserver ="localhost";
+   // $gtsserver ="track.glovision.co";
+}
+if($serverDerection=="new"){
+ // $gtsserver ="glotrax.glovision.co";
+//      $gtsserver ="localhost";
+   //$gtsserver ="track.glovision.co";
+}
+
+
+?>

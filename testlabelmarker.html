@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+ <title>MarkerWithLabel Example</title>
+ <style type="text/css">
+   .labels {
+     color: red;
+     background-color: white;
+     font-family: "Lucida Grande", "Arial", sans-serif;
+     font-size: 10px;
+     font-weight: bold;
+     text-align: center;
+     width: 58px;
+     height:20px;
+     border: 2px solid black;
+     white-space: nowrap;
+   }
+ </style>
+ <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false"></script>
+ <script type="text/javascript" src="js/markerlabel.js"></script>
+ <script type="text/javascript">
+   function initMap() {
+     var latLng = new google.maps.LatLng(41.76, -72.67);
+     var map = new google.maps.Map(document.getElementById('map_canvas'), {
+       zoom: 12,
+       center: latLng,
+       mapTypeId: google.maps.MapTypeId.ROADMAP
+     });
+     var marker1 = new MarkerWithLabel({
+       position: new google.maps.LatLng(41.7785409, -72.67627515399965),
+       draggable: true,
+       raiseOnDrag: true,
+       map: map,
+       labelText:'ts',
+       labelContent: "SAND",
+       labelAnchor: new google.maps.Point(22, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 0.75}
+     });
+     var marker2 = new MarkerWithLabel({
+       position: new google.maps.LatLng(41.73306244, -72.70739863999967),
+       draggable: true,
+       raiseOnDrag: true,
+       map: map,
+       labelContent: "Batchelder",
+       labelAnchor: new google.maps.Point(22, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 1.0}
+     });
+     
+       var marker3 = new MarkerWithLabel({
+       position: new google.maps.LatLng(41.746272, -72.69846834699968),
+       draggable: true,
+       raiseOnDrag: true,
+       map: map,
+       labelContent: "Mont-Moylan",
+       labelAnchor: new google.maps.Point(22, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 1.0}
+     });
+     
+       var marker3 = new MarkerWithLabel({
+       position: new google.maps.LatLng(41.746272, -72.69846834699968),
+       draggable: true,
+       raiseOnDrag: true,
+       map: map,
+       labelContent: "Mont-Moylan",
+       labelAnchor: new google.maps.Point(22, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 1.0}
+     });
+     
+       var marker4 = new MarkerWithLabel({
+       position: new google.maps.LatLng(41.746272, -72.69846834699968),
+       draggable: true,
+       raiseOnDrag: true,
+       map: map,
+       labelContent: "Moylan",
+       labelAnchor: new google.maps.Point(22, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 1.0}
+     });
+     
+       var marker5 = new MarkerWithLabel({
+       position: new google.maps.LatLng(41.7614408, -72.69043789599965),
+       draggable: true,
+       raiseOnDrag: true,
+       map: map,
+       labelContent: "Burns",
+       labelAnchor: new google.maps.Point(22, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 1.0}
+     });
+     
+       var marker6 = new MarkerWithLabel({
+       position: new google.maps.LatLng(41.734732, -72.67980545099965),
+       draggable: true,
+       raiseOnDrag: true,
+       map: map,
+       labelContent: "Asian",
+       labelAnchor: new google.maps.Point(22, 0),
+       labelClass: "labels", // the CSS class for the label
+       labelStyle: {opacity: 1.0}
+     });
+     
+   }
+ </script>
+</head>
+<body onload="initMap()">
+<h3>Public school buildings in Hartford (with static marker labels, draggable to reposition).</h3>
+ Pro: Option to draw data from Google spreadsheet, change markers, change bkgnd map opacity, add HPS zone KML<br>
+ Con: Will be challenging to squeeze in 58 school labels<br>
+ See code at GitHub <a href="https://github.com/JackDougherty/gmap-marker-labels" target="_blank">https://github.com/JackDougherty/gmap-marker-labels</a>
+ <div id="map_canvas" style="height: 400px; width: 100%;"></div>
+ <div id="log"></div>
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"> -->
+<!-- <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> -->
+<!-- <html xmlns='http://www.w3.org/1999/xhtml' xmlns:v='urn:schemas-microsoft-com:vml'>-->
+<!-- custom/loginSession_cbanner.jsp: E2.5.3-B03 [default] page=login
+  =======================================================================================
+  Copyright(C) 2007-2013 Glovision Techno Services, All rights reserved
+  Centered image banner
+  =======================================================================================
+-->
+<!-- meta -->
+<html>
+   <head>
+       <meta name="author" content="Glovision Techno Services"/>
+       <meta http-equiv="content-type" content='text/html; charset=UTF-8'/>
+       <link rel="shortcut icon" href="images/glovision.ico"/>
+       <title>Glovision Techno Services</title>
+       <script src="js/jquery-1.9.1.min.js"
+           type="text/javascript"></script>
+     <!--    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+      <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>-->
+         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=drawing"></script>
+       <!--  <script src="../../../vehiclesStatus.js" type="text/javascript"></script> -->
+        <script src="js/tac.js" type="text/javascript"></script>
+      <!--    <script src="../../../search.js" type="text/javascript"></script>-->
+      
+       
+    <link href="css/fuelbar.css" rel="stylesheet" type="text/css" /> 
+       <link rel="stylesheet" type="text/css" href="js/jquery.datetimepicker.css"/>
+<script src="js/jquery.datetimepicker.js" type="text/javascript"></script>
+
+       <script>
+           google.maps.event.addDomListener(window, 'load', initialise4);
+           var nochangeofflineonlineidle='no';
+           $(document).ready(function(){ 
+        	   
+        	 
+        	
+        		  
+        		$('.load_image1').show();
+        		vehicleAvailable=[];
+        		var requestFromTrack="no";
+        		var AccountIDFromTrack;
+        		vehicleWithEventData=[];
+        	
+        		$("#play").attr("disabled", "disabled");
+        		var liveSpeedMonitoringAtLoad=function(){
+        			vehicleStatusFunction();
+        			$("#play").attr("disabled", "disabled");
+        		id=setInterval(function(){
+        			vehicleStatusFunction();
+
+        		 },180000);
+        		}
+        		//180000
+        	    var vehicleStatusFunction=function(){
+        	    	$('.vehicleStatusReport').hide();
+        	    	$('.load_image1').show();
+        	    var Account=window.localStorage.getItem('accountID');
+        	   /* if(requestFromTrack=="yes") {
+        	    	Account="nslsugars";
+            	    window.localStorage.setItem('accountID',Account);
+            	  alert(Account+' ra,ama');
+            	  }
+        	  
+        	    */
+        	      
+        	    var vid=$( "#vehicleID" ).val();
+        	    var from=$( "#fromDate" ).val();
+        	    var to=$( "#toDate" ).val();
+        	    from=fuelDBConverts(from);
+        	    to=fuelDBConverts(to);
+        	  
+        	    var userID= window.localStorage.getItem('userId');
+        	    $.ajax({
+        	        type : 'get',
+        	        //url:'php/vehiclesStatus.php',
+        	        url:'php/vehiclesStatus.php',
+        	        data:{"vehicleID":vid, "accountID":Account,"fromDate":from,"toDate":to,"userID":userID},
+        	        dataType:'json',
+        	        success: function(data) {
+        	            $.each(data, function() {
+        	                 $.each(data, function(key, value) {
+        	                	 if(value.length<=1){ 
+        	                		 //alert("Vehicle Has No movement");
+        	                	 }
+        	                	// alert(value.length);
+        	                     globalVehicles= window.localStorage.getItem('globalVehicles').split(',');//getting global Vehicles From FuelVehicles.js     
+        	                     globalVehicles1= window.localStorage.getItem('globalVehicles1').split(',');//getting global Vehicles From FuelVehicles.js     
+        	                     var vehicleWithEventDataIndx=0;
+        	                     //alert(value.length);
+        	                     
+        	                	 for(var vehicleindx=0;vehicleindx<globalVehicles.length;vehicleindx++,vehicleWithEventDataIndx++){
+        	                	     vehicleWithEventData[vehicleWithEventDataIndx]=[];//create doube array for each vehicle to store event data
+        	                		 var eventDataIndx=0;
+        	                	     for(var loopindx1=0;loopindx1<value.length;loopindx1++){
+        	                		     if(globalVehicles[vehicleindx].toLowerCase()==value[loopindx1][9].toLowerCase()){
+        	                                 vehicleWithEventData[vehicleWithEventDataIndx][eventDataIndx]=value[loopindx1];
+        	                                 eventDataIndx++;
+        	                             }
+        	                	     }//end inner oop
+        	                	 }//end outer loop
+        	                	 //alert(vehicleWithEventDataIndx);
+        	                	 var i=document.getElementById("Name");
+        	                	 i.innerHTML=Account+" | User-"+userID;
+        	                	var showmap= window.localStorage.getItem('showmap');
+        	                	 if(showmap=="all" || showmap=="online" || showmap=="offline" || showmap=="idle"){
+        	                	     allVehicleStatus(); 
+        	                	 }else{
+        	                	    MapClear();
+        	                	 }
+        	                });
+        	            });
+        	        }
+        	     });
+        	}
+        	    
+        	    var value = window.localStorage.getItem('packagingidentify');
+        	    var Account=window.localStorage.getItem('accountID');
+          	  /*   if(Account == '' || Account == undefined) {
+          	    	
+       	    	   Account="nslsugars";
+           	       window.localStorage.setItem('accountID',Account);
+           	       alert(Account);
+           	      requestFromTrack="yes";
+       	         }
+        	    */
+        	    
+                value=value.split(",");
+                 if(value[22]!='1'){
+                     window.alert("You are not entitled to use this feature please contact support@glovision.co")
+                     window.location = 'main.jsp'
+                 }else{
+                	  
+        	    $(window).load(validuser);
+        	    $(window).load(vehicle);
+        	    $(window).load(liveSpeedMonitoringAtLoad);
+        	    $('#vehicleID').change(vehicleStatusFunction);
+        	    $('#reset').click(allvehiclesInfo);
+        	    
+        	    $('#online').click(online);
+        	    $('#idle').click(idle);
+        	    $('#offline').click(offline);
+        	    
+        	    
+        	    $('#getRoute').click(vehicleStatusFunction);
+        	    $('#multyPath').click(twoVehiclePath);
+        	    $('#allVehicles').click(allVehicleStatus);
+        	    $('#lableDiplay').change(allVehicleStatus);
+        	    $('#play').click(liveSpeedMonitoringAtLoad);
+        	    $('#allVehiclesWithRoutes').click(allVehicleStatusWithRoute);
+        	    $('#MapClear').click(MapClear);
+        	    
+                 }
+        	    
+        	    
+        	})
+       </script>
+      
+   </head>
+   <style>
+   html { height: 100% } body { height: 100%; margin: 0; padding: 0 } 
+   #mapcontainer { height: 100%; width:65%; float:right;border-style: solid;border-color: #086A87; } 
+   #wrapper { position: relative; } 
+  #vehicleStatusReport {width:34%; position: absolute; background-color: transparent; top: 200px; left: 10px; z-index: 99; background: #A9BCF5;border-style: solid;border-color: #086A87; } 
+  #time { position: absolute; background-color: transparent; bottom: 10px; right: 10px; z-index: 99; background: #81BEF7;opacity:0.5; }
+   #logout { position: absolute; background-color: transparent; top:5px; left: 35%; z-index: 99; background: #0489B1;opacity:1;} 
+  #arrow{
+   border-color: transparent transparent #084B8A transparent;
+    border-style: solid;
+    border-width: 0px 10px 10px 10px;
+    height: 0px;
+    width: 0px;
+    position: absolute;top:98%; left: 68%; z-index: 99; background: #FBF3F3;opacity:1;
+ 
+  }
+    #arrow2{
+   border-color: transparent transparent #084B8A transparent;
+    border-style: solid;
+    border-width: 0px 40px 40px 40px;
+     border-height: 0px 40px 40px 40px;
+    height: 0px;
+    width: 0px;
+    position: absolute;top:94%; left: 68%; z-index: 99; background: #FBF3F3;opacity:1;
+ 
+  }
+     #bottom {
+
+      position: absolute; background-color: transparent;width:60%; top:99%; left: 37%; z-index: 99; background: #084B8A;opacity:1;} 
+  
+  #report {
+
+      position: absolute; background-color: transparent;width:65%; top:95%; left: 35%;height:40px; z-index: 99; background: #084B8A;opacity:1;
+      } 
+  
+   #allVehicls { position: absolute; width:20%;background-color: transparent; top:30px; left: 55%; z-index: 99; background: #81BEF7;opacity:1;} 
+    #runningVehilces { position: absolute; width:20%;background-color: #A9F5A9; top:30px; left: 60%; z-index: 99; background: #A9F5A9;opacity:1;} 
+  #idleVehilces { position: absolute; width:20%;background-color: transparent; top:30px; left: 65%; z-index: 99; background: #F5BCA9;opacity:1;} 
+  #offlineVehilces { position: absolute; width:20%;background-color: transparent; top:30px; left: 68%; z-index: 99; background: #BDBDBD;opacity:1;} 
+ 
+   #availableVehicle{ position: absolute; background-color: transparent; top: 20px; left: 10px; z-index: 99; background: #81BEF7;}
+   #flags{position: absolute; background-color: transparent; top: 1px; left: 10px; z-index: 99; background: #81BEF7;}
+  .load_image1{height: 100%; width:100%; position: absolute; background-color: transparent; top: 60px; left: 20px; z-index: 99; background: #CDD0D0; opacity:0.3;}
+   #mail{ position: absolute; background-color: transparent; bottom: 250px; right: 10px; z-index: 99; background: #81BEF7;opacity:0.5; }
+   #msg{ position: absolute; background-color: transparent; top: 250px; right: 10px; z-index: 99; background: #81BEF7;opacity:1; }
+  #flags,#msg {
+   
+    background: white;
+    border-style: solid;
+    border-color: #086A87;
+    width:34%;
+    height: 145px; 
+} 
+      #innerDiv {
+   
+    background: white;
+    border-style: solid;
+    border-color: #0000ff;
+    width:29%;
+    height: 80%; 
+}
+  
+.load_image2{
+background-image:url('images/ajax-loader-original.gif');
+ width: 47px;  
+height: 47px;
+align:center;
+}
+.divdisign
+{
+font-size:5pt;
+font-family:times new roman;
+font-weight:bold;
+font-style:italic;
+
+}
+
+   </style>
+   <script language="javascript"> 
+ 
+   function show() {
+     // Get the DOM reference
+     var contentId = document.getElementById("vehicleStatusReport");
+     
+   contentId.style.display = "block"; 
+  /* var duration = 1000;
+   // how many times should it should be changed in delay duration
+   var AmountOfActions=100;
+
+contentId.style.height = 0;  
+var counte=0;
+   setInterval(function(){counte ++;
+      if ( counte<AmountOfActions) { contentId.style.height = counte/AmountOfActions;}
+   },
+   duration / AmountOfActions);
+   */
+   }
+    
+  function hide(){
+      var contentId = document.getElementById("vehicleStatusReport");
+         // Toggle 
+         contentId.style.display = "none"; 
+        /* contentId.style.display == "block" ? contentId.style.display = "none" : 
+       contentId.style.display = "block"; */
+  }
+  
+  function allshow() {
+	  var contentId = document.getElementById("allVehicls");
+	  contentId.style.display = "block"; 
+	  document.getElementById("runningVehilces").style.display = "none"; 
+	  document.getElementById("idleVehilces").style.display = "none"; 
+	  document.getElementById("offlineVehilces").style.display = "none"; 
+  }
+  function allhide() {
+	  
+	       var userID=window.localStorage.getItem('userId');
+	      // document.getElementById('vehiclehealth').style.display = 'none';
+      if(userID!="admin"){
+	      //document.getElementById('vehiclehealth').style.display = 'none';
+	      document.getElementById('invoice').style.display = 'none';
+      }
+	  var contentId = document.getElementById("allVehicls");
+      contentId.style.display = "none"; 
+      document.getElementById("runningVehilces").style.display = "none"; 
+	  document.getElementById("idleVehilces").style.display = "none"; 
+	  document.getElementById("offlineVehilces").style.display = "none"; 
+  }
+  function runningshow() {
+	  var contentId = document.getElementById("allVehicls");
+	  contentId.style.display = "none"; 
+	  document.getElementById("runningVehilces").style.display = "block"; 
+	  document.getElementById("idleVehilces").style.display = "none"; 
+	  document.getElementById("offlineVehilces").style.display = "none"; 
+  }
+  function idleshow() {
+	  var contentId = document.getElementById("allVehicls");
+      contentId.style.display = "none"; 
+      document.getElementById("runningVehilces").style.display = "none"; 
+	  document.getElementById("idleVehilces").style.display = "block"; 
+	  document.getElementById("offlineVehilces").style.display = "none"; 
+  }
+  function offlineshow() {
+	  var contentId = document.getElementById("allVehicls");
+      contentId.style.display = "none"; 
+      document.getElementById("runningVehilces").style.display = "none"; 
+	  document.getElementById("idleVehilces").style.display = "none"; 
+	  document.getElementById("offlineVehilces").style.display = "block"; 
+  }
+  
+  function reporthide() {
+	  var contentId = document.getElementById("report");
+      contentId.style.display = "none"; 
+     
+    // document.getElementById("bottom").style.display = "block";
+    //  document.getElementById("arrow").style.display = "block";
+     // document.getElementById("arrow2").style.display = "block";
+       // document.getElementById("arrow").style.top = "98%"; 
+      //document.getElementById("runningVehilces").style.display = "none"; 
+	  //document.getElementById("idleVehilces").style.display = "none"; 
+	 // document.getElementById("offlineVehilces").style.display = "block"; 
+  }
+  function reportshow(){
+	  var contentId = document.getElementById("report");
+      contentId.style.display = "block";
+    //  document.getElementById("arrow").style.display = "block";
+    //  document.getElementById("bottom").style.display = "block";
+     // document.getElementById("arrow2").style.display = "block";
+    
+     
+  }
+  
+  function getOffline(){
+		 var formate =document.getElementById("reportFormate").value;
+		 var ac=window.localStorage.getItem('accountID');
+		  var uid=window.localStorage.getItem('userId');
+		  if(uid != "monitoring"){
+		 // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+		 window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+		 }
+		 
+    
+}
+
+
+ function getOfflineDownload(){
+                  var formate =document.getElementById("reportFormate").value;
+                                   var ac=window.localStorage.getItem('accountID');
+                                                     var uid=window.localStorage.getItem('userId');
+                                                                      // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+                                                                                       window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate=excel");
+
+
+    }
+
+function getOfflineNottrackingDownload(){
+                  var formate =document.getElementById("reportFormate").value;
+                                                     var ac=window.localStorage.getItem('accountID');
+                                                                                                          var uid=window.localStorage.getItem('userId');
+                                                                                                                                                                                // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+                                                                                                                                                                                                                                                                       window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offlinenottracking&formate=excel");
+
+
+    }
+    function getOfflineNotRespondingDownload(){
+                      var formate =document.getElementById("reportFormate").value;
+                                                         var ac=window.localStorage.getItem('accountID');
+                                                                                                              var uid=window.localStorage.getItem('userId');
+                                                                                                                                                                                    // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+                                                                                                                                                                                                                                                                           window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offlinenotresponding&formate=excel");
+
+
+    }
+
+
+function getOnline(){
+                 var formate =document.getElementById("reportFormate").value;
+                                  var ac=window.localStorage.getItem('accountID');
+                                                    var uid=window.localStorage.getItem('userId');
+                                                                     // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+                                                                                      window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=online&formate=excel");
+
+
+    }
+function getRunning(){
+                 var formate =document.getElementById("reportFormate").value;
+                                  var ac=window.localStorage.getItem('accountID');
+                                                    var uid=window.localStorage.getItem('userId');
+                                                                     // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+                                                                                      window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=running&formate=excel");
+
+
+    
+}
+
+function getIdle(){
+                 var formate =document.getElementById("reportFormate").value;
+                                  var ac=window.localStorage.getItem('accountID');
+                                                    var uid=window.localStorage.getItem('userId');
+                                                                     // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=offline&formate="+formate);
+                                                                                      window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&offline=idle&formate=excel");
+
+
+    }
+
+function statusReportDownload(){
+                var formate =document.getElementById("reportFormate").value;
+                                 var ac=window.localStorage.getItem('accountID');
+                                                   var uid=window.localStorage.getItem('userId');
+                                                                    // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&formate="+formate);
+                                                                                      window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&formate=excel");
+
+
+        }
+
+	function statusReport(){
+		var formate =document.getElementById("reportFormate").value;
+		 var ac=window.localStorage.getItem('accountID');
+		  var uid=window.localStorage.getItem('userId');
+		 // window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&formate="+formate);
+		  window.open("/dashboard/php/vehiclesStatus.php?&accountID="+ac+"&userID="+uid+"&currentLocation=currentlocation&formate="+formate);
+
+		
+	}
+	function inmotion(){
+		var formate =document.getElementById("reportFormate").value;
+		 var ac=window.localStorage.getItem('accountID');
+		  var uid=window.localStorage.getItem('userId');
+		  window.open("/dashboard/php/InmotionReport.php?&accountID="+ac+"&userID="+uid+"&formate="+formate);
+
+		
+	}
+	
+	
+   </script>
+</script>
+   
+   <!--  
+   <body background="../../../images/background.jpg">
+       <table align="center" class="BaseTable" background="#E0E6F8">  
+          <tr>
+              <td>
+                  <div id="header" align="left" data-role="header" data-theme="f">
+                  <img src="../../../images/glovision.png" align="center" width="150"
+                       height="55">
+                  </div>
+              </td>
+              <td> 
+                  <span class="active">  &nbsp; <a href="main.jsp" rel="external">Home</a>&nbsp&nbsp&nbsp&nbsp<u style="color:#47A3FF;"><a href="" align="right" onclick="logout()" style="text-decoration: none;"> Logout</a></u></span>
+              </td>
+              <td>
+                  <div class="accountDiv" align="left" id="acc1"></div>
+              </td>
+              
+               
+                                <td>
+                                     <select id="vehicleID">
+                                           <option value="select">All Vehicle</option>
+                                     </select>
+                               </td>
+                         
+              
+             
+              
+              
+          </tr>
+       </table>
+       <br>
+       
+       <table align="center" border="2" class="one" style="background-color:#5882FA;">
+           <tr>
+               <td  width="20%">
+                    <div class="load_image" align="center" class='hello' style='height:700;border:solid 2px orange;overflow:scroll;overflow-y:scroll;overflow-x:scroll;'>
+                             <div class="load_image1" align="center"> </div>
+                    </div>
+                    <div  id="vehicleStatusReport" class="vehicleStatusReport" align="center" >   </div>
+               </td>
+               <td width="80%">
+                   <div  id="mapcontainer" class="mapcontainer" align="center" >   </div>
+               </td>
+               <td>
+                   <div class='hello' style='height:100%;border:solid 2px orange;overflow:scroll;overflow-y:scroll;overflow-x:scroll;'>
+                      <table>
+                        
+                          <tr>
+                               <td colspan="2"><label>From Date:</label><input  id="fromDate" name="fromDate"/></td>
+                          </tr>
+                          <tr>
+                               <td colspan="2"><label>To Date</label><input id="toDate" name="toDate"/></td>
+                          </tr>
+                          <tr>
+                                <td colspan="2"><input type="button" id="reset" value="Reset"/></td>
+                          </tr>
+                          <tr>
+                                  <td colspan="2"><input type="button" id="getRoute" value="Get Route"/></td>
+                           </tr>
+                          <tr>
+                                 <td colspan="2"><input type="button" id="multyPath" value="Two Vehicle Path"/></td>
+                          </tr>
+                      </table>
+                   </div>
+               </td>
+               
+           </tr> 
+       </table>
+      <div align="center">Powered by <a class="changeBlue" href=""  onclick="window.open('http://www.glovision.co')">Glovision</a></div>
+      <div id="footer" data-role="footer" data-theme="f" style="background-color:#81DAF5"> Copyright © 2013   Glovision Techno Services Pvt Ltd. " - All Rights Reserved "</div>
+   </body>
+</html>
+
+
+-->
+<body background="images/background.jpg" onload="allhide();reportshow();">
+
+      
+         <div id="allVehicls" onMouseOut="allhide()" onMouseOver='allshow()'></div>
+         <div id="runningVehilces" onMouseOut="allhide()" onMouseOver='runningshow()'></div>
+         <div id="idleVehilces" onMouseOut="allhide()" onMouseOver='idleshow()'></div>
+         <div id="offlineVehilces" onMouseOut="allhide()" onMouseOver='offlineshow()'></div>
+   <div id="logout" onMouseOver="this.style.opacity=1" onMouseOut="this.style.opacity=1;" class='hello'>
+       <table align="center" class="BaseTable" background="#01A9DB">  
+         <thead>  <tr>
+            <th> 
+            <!-- <a align="right" onclick="logout()" style="text-decoration: none;color:white;"> Back</a> -->
+            <font color="white"><u style="color:white;"><a onclick="back()" rel="external" style="color:white;">Back</a></u>  </font>
+             </th><th>
+                  <div id="Name"></div>
+                 <!--  <div class="accountDiv" align="left" id="acc1"><input type="button" id="reset" value="Reset Map"/></div>-->
+             </th><th><input type="button" id="reset" value="All" onMouseOver='allshow()'  class='buttons'/><input type="button" id="online" value="Running" onMouseOver='runningshow()' class='buttons'/><input type="button" id="idle" value="Idle" onMouseOver='idleshow()' class='buttons'/><input type="button" id="offline" value="Offline" onMouseOver='offlineshow()' class='buttons'/><input type="button" id="MapClear" value="Clear Map" class='buttons'/></th><th>
+                                  
+             </th>
+             
+         </tr></thead>
+       </table>
+      
+       </div>
+       <!--  bottom div -->
+      <!--    <div id="arrow2" onclick="reporthide()"></div>-->
+       <div id="report" onMouseOver="this.style.opacity=1">
+         <center>
+         <table>
+              <tr><th><input type="button" id="offline" value="Offline Vehicles"  class='buttons' onclick='getOffline();'/></th>
+              <th><input type="button" id="online" value="Current Status For All Vehicles"  class='buttons' onclick='statusReport();'/></th>
+              <th><input type="button" id="inmotion" value="Inmotion Report"  class='buttons' onclick='inmotion();'/></th>
+              <th><input type="button" id="vehiclehealth" value="Vehicle's Health Status "  class='buttons' onclick='inmotion();'/><input type="button" id="invoice" value="Invoice "  class='buttons' onclick='inmotion();'/></th>
+              <th><select id='reportFormate' style='max-width:90px;' class='buttons'><option value='html'>HTML</option><option value='word'>Word</option><option value='excel'>Excel</option></select></th>
+          </tr>
+          </table>
+          </center>
+       </div>
+       
+    <!--       <div id="bottom" onMouseOver="this.style.opacity=1" onMouseOut="this.style.opacity=1;" class='hello'>
+ <br>
+      
+       </div> -->
+    <!--       <div id="arrow" onClick="reportshow()">
+  
+      
+       </div>-->
+             <div id="wrapper" >
+               <!--  div 0 -->
+                <div  id="mapcontainer" class="mapcontainer" >   </div>
+
+                <div class="load_image1" align="center">
+                      <div class="load_image2"> </div>
+                </div>
+                <!--   <div class='hello' id="availableVehicle" onMouseOver="show();this.style.opacity=0.5;"  onMouseOut="hide();this.style.opacity=0.5;" ><table border='1' align='center'><thead><tr><th>Vehicle Id</th><th>OdoMeter Reading</th><th>Location </th><th>Status</th><th>Replay</th><th>A/C</th></tr></thead></table></div>
+                <div  id="vehicleStatusReport"  onMouseOut="hide();" onMouseOver="show();this.style.opacity=0.8;" style='display:none'>   </div>
+                -->
+                <!--  div 1 -->
+               
+                  <div class='hello' id="availableVehicle" style="width:34%;top: 145px;border-style: solid;border-color: #086A87; " ><table border='1' align='center'><thead><tr><th>Vehicle Id</th><th>OdoMeter Km/Speed</th><th>Location </th><th>Status</th></tr></thead></table><input id='ss' name='filter' onkeyup='filter(this,0)' size='5' type='text' placeholder='Vehilce Search'><input id='ad' size='5' name='filter' onkeyup='filter(this,2)' type='text' placeholder='Address Search'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</div>
+   <br>            
+              
+                <div  id="vehicleStatusReport">   </div>
+               
+                 <!-- div2 -->
+                <div id="time" style="visibility: hidden;" onMouseOver="this.style.opacity=1" onMouseOut="this.style.opacity=0.5;" class="hello">
+                      <table>
+                        
+                          <tr>
+                               <td colspan="2"><label>From Date:</label><input  id="fromDate" name="fromDate"/></td>
+                          </tr>
+                          <tr>
+                               <td colspan="2"><label>To Date</label><input id="toDate" name="toDate"/></td>
+                          </tr>
+                          <tr>
+                                <td colspan="1"><input type="button" id="reset" value="Reset"/></td>
+                                <td colspan="1"><input type="button" id="play" value="Play" readonly="readonly"/>
+                                                <select id="lableDiplay">
+                                                       <option value="disable">Label Disable</option>
+                                                       <option value="enable">Label Displaye</option>
+                                                </select>
+                                
+                                </td>
+                          </tr>
+                          <tr>
+                                  <td colspan="1"><input type="button" id="getRoute" value="Get Route"/></td>
+                                   <td colspan="1"><input type="button" id="multyPath" value="Two Vehicle Path"/></td>
+                           </tr>
+                          
+                           <tr>
+                                 <td colspan="1"><input type="button" id="allVehicles" value="All Vehicles"/></td>
+                                  <td colspan="1"><input type="button" id="allVehiclesWithRoutes" value="All Vehicles With Routes"/></td>
+                          </tr>
+                         
+                      </table>
+                   </div>
+                   
+                  <!--  div 3 --> 
+                  <div id="flags" class='hello2'>
+                            <table>
+                       <tr><td>&nbsp&nbspTotal Vehicle &nbsp&nbsp:</td><td></td></tr>
+        <tr><td>&nbsp&nbspOnline Vehicle :</td><td></td></tr>
+        <tr><td></td><td>Running : </td></tr>
+    	 <tr><td></td><td>Idle: </td></tr>
+    	 
+    	<tr><td></td><td>Stopped : </td></tr>
+    	 <tr><td>&nbsp&nbspOffline &nbsp&nbsp&nbsp&nbsp&nbsp : </td><td></td></tr>
+                    </table>
+                    <!--    <table>
+                          <tr>
+                             
+                               <td> Running <img src="images/ambulance/RunningS.png"  width="20"  height="20"></td>
+                              <td> Idle<img src="images/ambulance/IdleS.png"  width="20" height="20"></td>
+                              <td> Ignition Off<img src="images/ambulance/stoppedS.png" width="20" height="20"></td>
+                               <td> Offline <img src="images/ambulance/offlineS.png"  width="20" height="20"></td>
+                              
+                          </tr>
+                      </table>
+                      
+                       -->
+                      
+                       
+                  </div>
+                  <!--   <div id="msg" style="width:300px;height:300px;background:white;display:none;overflow-y:scroll" onMouseOver="this.style.opacity=1" onMouseOut="document.getElementById('mail').style.display='block';document.getElementById('msg').style.display='none'"><div id="msgcontent"></div></div>
+               -->   <div id="mail" onMouseOver="this.style.display='none';document.getElementById('msg').style.display='block';"><img src="../../../images/mail.png"  width="50"  height="50" ></div>
+               </div>
+        
+  <!--      <div align="center">Powered by <a class="changeBlue" href=""  onclick="window.open('http://www.glovision.co')">Glovision</a></div>
+             <div id="footer" data-role="footer" data-theme="f" style="background-color:#81DAF5"> Copyright © 2013   Glovision Techno Services Pvt Ltd. " - All Rights Reserved "</div>
+            
+      -->   </body>
+</html>
